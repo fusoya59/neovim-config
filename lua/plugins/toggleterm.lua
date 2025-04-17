@@ -3,6 +3,7 @@ return {
   version = '*',
   config = function()
     require('toggleterm').setup {
+      shell = '/bin/bash -l',
       -- Open terminal with Control + \
       open_mapping = [[<C-\>]],
       -- Show as floating window, but you can use 'horizontal' or 'vertical' too
