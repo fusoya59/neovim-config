@@ -63,12 +63,16 @@ return {
 
     local servers = {
       pyright = {
+        before_init = function(_, config)
+          config.settings.python.pythonPath = vim.fn.getcwd()
+        end,
         settings = {
           python = {
             analysis = {
               diagnosticMode = 'workspace',
               autoImportCompletions = true, -- Enable auto-import suggestions
               typeCheckingMode = 'basic', -- Options: 'off', 'basic', 'strict'
+              extraPaths = { vim.fn.getcwd() },
             },
           },
         },
