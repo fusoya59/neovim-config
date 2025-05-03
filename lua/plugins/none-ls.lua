@@ -22,7 +22,7 @@ return {
     }
 
     local sources = {
-      diagnostics.mypy,
+      diagnostics.mypy.with { extra_args = { '--python-executable', vim.fn.exepath 'python3' } },
       formatting.prettier.with { filetypes = { 'html', 'json', 'yaml', 'markdown' } },
       formatting.stylua,
       formatting.shfmt.with { args = { '-i', '4' } },
@@ -33,7 +33,7 @@ return {
 
     local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
     null_ls.setup {
-      -- debug = true, -- Enable debug mode. Inspect logs with :NullLsLog.
+      debug = true, -- Enable debug mode. Inspect logs with :NullLsLog.
       sources = sources,
       -- you can reuse a shared lspconfig on_attach callback here
       on_attach = function(client, bufnr)
