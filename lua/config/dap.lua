@@ -1,19 +1,42 @@
 local dap = require 'dap'
 local dapui = require 'dapui'
 
--- Define signs and highlights
-vim.fn.sign_define('DapStopped', {
-  text = '▶',
-  texthl = 'DiagnosticInfo',
-  linehl = 'DapStoppedLine',
-  numhl = 'DiagnosticInfo',
-})
-vim.api.nvim_set_hl(0, 'DapStoppedLine', { bg = '#49451e', bold = true })
+-- VSCode-like highlights for DAP
+vim.api.nvim_set_hl(0, 'DapBreakpoint', { fg = '#ff0000' })
+vim.api.nvim_set_hl(0, 'DapBreakpointCondition', { fg = '#ff8800' })
+vim.api.nvim_set_hl(0, 'DapLogPoint', { fg = '#5c5cff' })
+vim.api.nvim_set_hl(0, 'DapStopped', { fg = '#00ff00' })
+
+-- VSCode's debug highlight has a light yellow background
+vim.api.nvim_set_hl(0, 'DapStoppedLine', { bg = '#2d2e2f', fg = '#ffffff', bold = true })
+
+-- Define signs with VSCode-like appearance
 vim.fn.sign_define('DapBreakpoint', {
   text = '●',
-  texthl = 'DiagnosticError',
+  texthl = 'DapBreakpoint',
   linehl = '',
   numhl = '',
+})
+
+vim.fn.sign_define('DapBreakpointCondition', {
+  text = '◆',
+  texthl = 'DapBreakpointCondition',
+  linehl = '',
+  numhl = '',
+})
+
+vim.fn.sign_define('DapLogPoint', {
+  text = '◆',
+  texthl = 'DapLogPoint',
+  linehl = '',
+  numhl = '',
+})
+
+vim.fn.sign_define('DapStopped', {
+  text = '▶',
+  texthl = 'DapStopped',
+  linehl = 'DapStoppedLine',
+  numhl = 'DapStopped',
 })
 
 -- Setup DAP UI auto-open/close events (define once)
@@ -75,5 +98,35 @@ dap.configurations.python = {
     request = 'launch',
     name = 'Launch current file',
     program = '${file}',
+  },
+  {
+    type = 'python',
+    request = 'launch',
+    name = 'Launch with debug.json',
+    program = function()
+      local file = io.open('.dap/debug.json', 'r')
+      if not file then
+        vim.notify('Debug config file not found: .dap/debug.json', vim.log.levels.ERROR)
+        return '${file}'
+      end
+
+      local content = file:read '*all'
+      file:close()
+
+      local status, config = pcall(vim.fn.json_decode, content)
+      if not status then
+        vim.notify('Failed to parse debug config: ' .. config, vim.log.levels.ERROR)
+        return '${file}'
+      end
+
+      -- Apply all settings from the JSON file
+      for k, v in pairs(config) do
+        if k ~= 'type' and k ~= 'request' and k ~= 'name' then
+          dap.configurations.python[2][k] = v
+        end
+      end
+
+      return config.program or '${file}'
+    end,
   },
 }
