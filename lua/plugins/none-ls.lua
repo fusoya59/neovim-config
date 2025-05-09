@@ -22,7 +22,28 @@ return {
     }
 
     local sources = {
-      diagnostics.mypy.with { extra_args = { '--python-executable', vim.fn.exepath 'python3' } },
+      diagnostics.mypy.with {
+        extra_args = { '--python-executable', vim.fn.exepath 'python3' },
+        runtime_condition = function()
+          -- Get the active virtual environment path
+          local venv = os.getenv 'VIRTUAL_ENV'
+          if venv then
+            return true
+          else
+            -- Fall back to project-local venv detection
+            local cwd = vim.fn.getcwd()
+            local venv_path = cwd .. '/.venv' -- Adjust to your typical venv name
+            if vim.fn.isdirectory(venv_path) == 1 then
+              -- Set the PYTHONPATH to include the venv site-packages
+              local site_packages = venv_path .. '/lib/python3.10/site-packages' -- Adjust Python version
+              vim.env.PYTHONPATH = site_packages
+              return true
+            end
+          end
+          return false
+        end,
+      },
+
       formatting.prettier.with { filetypes = { 'html', 'json', 'yaml', 'markdown' } },
       formatting.stylua,
       formatting.shfmt.with { args = { '-i', '4' } },
