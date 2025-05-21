@@ -23,6 +23,14 @@ local function setup_whichkey()
         { '<leader>tr', '<cmd>Neotest run<cr>', desc = 'Run Nearest Test', buffer = 0 },
         { '<leader>ts', '<cmd>Neotest summary toggle<cr>', desc = 'Toggle Summary Panel', buffer = 0 },
         { '<leader>to', '<cmd>Neotest output-panel toggle<cr>', desc = 'Toggle Output Panel', buffer = 0 },
+        {
+          '<leader>td',
+          function()
+            require('neotest').run.run { strategy = 'dap' }
+          end,
+          desc = 'Debug Nearest Test',
+          buffer = 0,
+        },
       }
     end,
   })
