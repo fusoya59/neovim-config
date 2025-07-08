@@ -61,18 +61,33 @@ return {
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
+    local function get_python_path()
+      -- Use activated virtualenv.
+      if vim.env.VIRTUAL_ENV then
+        return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
+      end
+
+      -- Fallback to system Python.
+      return vim.fn.exepath 'python3' or vim.fn.exepath 'python' or 'python'
+    end
+
     local servers = {
-      pyright = {
-        before_init = function(_, config)
-          config.settings.python.pythonPath = vim.fn.getcwd()
-        end,
+      basedpyright = {
         settings = {
-          python = {
+          basedpyright = {
             analysis = {
-              diagnosticMode = 'workspace',
-              autoImportCompletions = true, -- Enable auto-import suggestions
-              typeCheckingMode = 'basic', -- Options: 'off', 'basic', 'strict'
-              extraPaths = { vim.fn.getcwd() },
+              diagnosticMode = 'openFilesOnly',
+              autoSearchPaths = true,
+              autoImportCompletions = true,
+              typeCheckingMode = 'basic',
+              useLibraryCodrForTypes = true,
+              diagnosticSeverityOverrides = {
+                reportMissingTypeStubs = false,
+                reportArgumentType = false,
+              },
+              inlayHints = {
+                callArgumentNames = true,
+              },
             },
           },
         },
@@ -82,6 +97,26 @@ return {
           },
         },
       },
+      -- pyright = {
+      --   before_init = function(_, config)
+      --     config.settings.python.pythonPath = vim.fn.getcwd()
+      --   end,
+      --   settings = {
+      --     python = {
+      --       analysis = {
+      --         diagnosticMode = 'workspace',
+      --         autoImportCompletions = true, -- Enable auto-import suggestions
+      --         typeCheckingMode = 'basic', -- Options: 'off', 'basic', 'strict'
+      --         extraPaths = { vim.fn.getcwd() },
+      --       },
+      --     },
+      --   },
+      --   capabilities = {
+      --     textDocument = {
+      --       formatting = { dynamicRegistration = false }, -- Disable formatting (handled by none-ls)
+      --     },
+      --   },
+      -- },
       ts_ls = {},
       html = { filetypes = { 'html', 'twig', 'hbs' } },
       cssls = {},
@@ -91,6 +126,17 @@ return {
       terraformls = {},
       jsonls = {},
       yamlls = {},
+      rust_analyzer = {
+        settings = {
+          ['rust-analyzer'] = {
+            cargo = { allFeatures = true },
+            checkOnSave = true,
+            procMacro = {
+              enable = true,
+            },
+          },
+        },
+      },
       lua_ls = {
         settings = {
           Lua = {

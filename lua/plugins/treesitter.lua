@@ -11,6 +11,7 @@ return { -- Highlight, edit, and navigate code
       'typescript',
       'vimdoc',
       'vim',
+      'rust',
       'regex',
       'terraform',
       'sql',
