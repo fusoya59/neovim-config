@@ -17,6 +17,7 @@ return {
         'eslint_d', -- ts/js linter
         'shfmt', -- Shell formatter
         'ruff', -- Python linter and formatter
+        'terraform',
       },
       automatic_installation = true,
     }
