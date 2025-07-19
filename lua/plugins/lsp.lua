@@ -61,16 +61,6 @@ return {
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-    local function get_python_path()
-      -- Use activated virtualenv.
-      if vim.env.VIRTUAL_ENV then
-        return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
-      end
-
-      -- Fallback to system Python.
-      return vim.fn.exepath 'python3' or vim.fn.exepath 'python' or 'python'
-    end
-
     local servers = {
       basedpyright = {
         settings = {
@@ -84,6 +74,7 @@ return {
               diagnosticSeverityOverrides = {
                 reportMissingTypeStubs = false,
                 reportArgumentType = false,
+                reportDeprecated = false,
               },
               inlayHints = {
                 callArgumentNames = true,
@@ -97,26 +88,6 @@ return {
           },
         },
       },
-      -- pyright = {
-      --   before_init = function(_, config)
-      --     config.settings.python.pythonPath = vim.fn.getcwd()
-      --   end,
-      --   settings = {
-      --     python = {
-      --       analysis = {
-      --         diagnosticMode = 'workspace',
-      --         autoImportCompletions = true, -- Enable auto-import suggestions
-      --         typeCheckingMode = 'basic', -- Options: 'off', 'basic', 'strict'
-      --         extraPaths = { vim.fn.getcwd() },
-      --       },
-      --     },
-      --   },
-      --   capabilities = {
-      --     textDocument = {
-      --       formatting = { dynamicRegistration = false }, -- Disable formatting (handled by none-ls)
-      --     },
-      --   },
-      -- },
       ts_ls = {},
       html = { filetypes = { 'html', 'twig', 'hbs' } },
       cssls = {},
@@ -151,7 +122,10 @@ return {
                 unpack(vim.api.nvim_get_runtime_file('', true)),
               },
             },
-            diagnostics = { disable = { 'missing-fields' } },
+            diagnostics = {
+              globals = { 'vim' },
+              disable = { 'missing-fields' },
+            },
             format = {
               enable = false,
             },
@@ -167,15 +141,15 @@ return {
       'stylua', -- Used to format Lua code
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-    require('mason-lspconfig').setup {
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end,
-      },
-    }
+    vim.api.nvim_create_autocmd('User', {
+      pattern = 'MasonToolsUpdateCompleted',
+      callback = function(e)
+        local lspconfig = require 'lspconfig'
+        for name, opts in pairs(servers) do
+          opts.capabilities = vim.tbl_deep_extend('force', {}, capabilities, opts.capabilities or {})
+          lspconfig[name].setup(opts)
+        end
+      end,
+    })
   end,
 }
