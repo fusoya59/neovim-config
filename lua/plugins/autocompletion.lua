@@ -92,7 +92,13 @@ return { -- Autocompletion
         -- Accept ([y]es) the completion.
         --  This will auto-import if your LSP supports it.
         --  This will expand snippets if the LSP sent a snippet.
-        ['<CR>'] = cmp.mapping.confirm { select = true },
+        ['<C-y>'] = cmp.mapping(
+          cmp.mapping.confirm {
+            behavior = cmp.ConfirmBehavior.Insert,
+            select = true,
+          },
+          { 'i', 'c' }
+        ),
 
         -- If you prefer more traditional completion keymaps,
         -- you can uncomment the following lines
@@ -171,5 +177,12 @@ return { -- Autocompletion
         end,
       },
     }
+
+    cmp.setup.filetype({ 'sql' }, {
+      sources = cmp.config.sources {
+        { name = 'vim-dadbod-completion' },
+        { name = 'buffer' },
+      },
+    })
   end,
 }
