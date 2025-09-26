@@ -97,7 +97,7 @@ return { -- Autocompletion
             behavior = cmp.ConfirmBehavior.Insert,
             select = true,
           },
-          { 'i', 'c' }
+          { 'i' }
         ),
 
         -- If you prefer more traditional completion keymaps,
@@ -184,5 +184,7 @@ return { -- Autocompletion
         { name = 'buffer' },
       },
     })
+
+    cmp.setup.filetype({ 'codecompanion' }, { sources = {} })
   end,
 }

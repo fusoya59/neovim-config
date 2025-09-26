@@ -144,10 +144,10 @@ return {
     vim.api.nvim_create_autocmd('User', {
       pattern = 'MasonToolsUpdateCompleted',
       callback = function(e)
-        local lspconfig = require 'lspconfig'
         for name, opts in pairs(servers) do
           opts.capabilities = vim.tbl_deep_extend('force', {}, capabilities, opts.capabilities or {})
-          lspconfig[name].setup(opts)
+          vim.lsp.config(name, opts)
+          vim.lsp.enable(name)
         end
       end,
     })

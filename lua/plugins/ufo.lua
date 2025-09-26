@@ -20,7 +20,7 @@ return {
   event = 'BufReadPost', -- Lazy-load on buffer read
   opts = {
     provider_selector = function(bufnr, filetype, buftype)
-      if filetype == 'neo-tree' or buftype == 'nofile' then
+      if filetype == 'neo-tree' then
         return ''
       end
       return { 'lsp', 'indent' } -- Use LSP with indent as fallback

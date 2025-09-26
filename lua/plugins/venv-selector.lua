@@ -10,7 +10,6 @@ return {
   keys = {
     { '<leader>v', '<cmd>VenvSelect<cr>', { desc = 'Select [v]env' } },
   },
-  ---@type venv-selector.Config
   opts = {
     -- Your settings go here
   },
