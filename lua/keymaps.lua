@@ -35,3 +35,7 @@ vim.keymap.set('n', '<C-Up>', '<C-w>k', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-Down>', '<C-w>j', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-Left>', '<C-w>h', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-Right>', '<C-w>l', { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader>dv', '<cmd>DiffviewOpen<CR>', { desc = 'Open Diffview', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>dh', '<cmd>DiffviewFileHistory<CR>', { desc = 'Diffview file history', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>dc', '<cmd>DiffviewClose<CR>', { desc = 'Close Diffview', noremap = true, silent = true })
