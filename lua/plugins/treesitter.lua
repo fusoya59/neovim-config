@@ -36,8 +36,13 @@ return {
   config = function()
     local nvim_treesitter = require 'nvim-treesitter'
 
-    nvim_treesitter.setup {}
-    nvim_treesitter.install(parsers)
+    nvim_treesitter.setup {
+      ensure_installed = parsers,
+      auto_install = true,
+      highlight = {
+        enable = true,
+      },
+    }
 
     local ts_augroup = vim.api.nvim_create_augroup('mark-treesitter', { clear = true })
     local skip_filetypes = {
